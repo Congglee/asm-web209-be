@@ -5,6 +5,7 @@ import mongoose from "mongoose";
 dotenv.config();
 
 import productRoute from "./routers/product.js";
+import categoryRoute from "./routers/category.js";
 
 const app = express();
 
@@ -15,6 +16,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cors());
 
 app.use("/api", productRoute);
+app.use("/api", categoryRoute);
 
 mongoose.connect(
   "mongodb+srv://root:congltph27602@asm-web209.hu4clmr.mongodb.net/?retryWrites=true&w=majority"
