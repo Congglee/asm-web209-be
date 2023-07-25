@@ -4,7 +4,7 @@ const generateAccessToken = (user) => {
   return jwt.sign(
     {
       _id: user.id,
-      role: user.role,
+      isAdmin: user.isAdmin,
     },
     process.env.JWT_SECRET,
     { expiresIn: "1d" }
@@ -15,7 +15,7 @@ const generateRefreshToken = (user) => {
   return jwt.sign(
     {
       _id: user.id,
-      role: user.role,
+      isAdmin: user.isAdmin,
     },
     process.env.JWT_SECRET,
     { expiresIn: "3d" }
