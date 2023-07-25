@@ -10,7 +10,7 @@ import {
   generateRefreshToken,
 } from "../middlewares/jwt.js";
 
-export const register = async (req, res) => {
+const register = async (req, res) => {
   try {
     const body = req.body;
     const { error } = registerSchema.validate(body, {
@@ -53,7 +53,7 @@ export const register = async (req, res) => {
   }
 };
 
-export const login = async (req, res) => {
+const login = async (req, res) => {
   try {
     const body = req.body;
     const { error } = loginSchema.validate(body, {
@@ -111,7 +111,116 @@ export const login = async (req, res) => {
   }
 };
 
-export const logOut = async (req, res) => {
+const logOut = async (req, res) => {
   res.clearCookie("refreshToken");
   res.status(200).json({ message: "Đăng xuất thành công!" });
 };
+
+const getUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findById(id).select("-password -isAdmin");
+
+    return res.status(200).json({
+      success: user ? true : false,
+      userData: user ? user : "Không tìm thấy tài khoản",
+    });
+  } catch (error) {
+    return res.status(400).status({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+const getUsers = async (req, res) => {
+  try {
+    const user = await User.find().select("-password -isAdmin");
+
+    return res.status(200).json({
+      success: user ? true : false,
+      users: user,
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ message: "Lỗi server: " + error.message, success: false });
+  }
+};
+
+const deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleteUser = await User.findByIdAndDelete(id);
+
+    return res.status(200).json({
+      success: deleteUser ? true : false,
+      deletedUser: deleteUser
+        ? `Xóa tài khoản với email ${deleteUser.email} thành công`
+        : "Xóa tài khoản thất bại",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+const updateUser = async (req, res) => {
+  try {
+    const { error } = updateUserSchema.validate(req.body, {
+      abortEarly: false,
+    });
+    if (error) {
+      const errors = error.details.map((errItem) => errItem.message);
+      return res.status(400).json({
+        success: false,
+        message: errors,
+      });
+    }
+
+    const { id } = req.params;
+
+    const { email } = req.body;
+    const checkEmail = await User.findOne({
+      _id: { $ne: id },
+      email,
+    });
+    if (checkEmail)
+      return res.status(401).json({
+        success: false,
+        message: "Email đã tồn tại, vui lòng nhập lại email khác!",
+      });
+
+    const updateUser = await User.findByIdAndUpdate(
+      {
+        _id: req.params.id,
+      },
+      req.body,
+      { new: true }
+    ).select("-password -isAdmin");
+
+    // const avatarFile = req.file;
+
+    // if (avatarFile) {
+    //   updateUser.avatar = avatarFile.path;
+    // }
+
+    // await updateUser.save();
+
+    return res.status(200).json({
+      success: updateUser ? true : false,
+      updatedUser: updateUser
+        ? updateUser
+        : "Cập nhật thông tin tài khoản thất bại",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export { register, login, logOut, getUser, getUsers, updateUser, deleteUser };
