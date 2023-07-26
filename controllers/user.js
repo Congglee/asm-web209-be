@@ -223,4 +223,61 @@ const updateUser = async (req, res) => {
   }
 };
 
-export { register, login, logOut, getUser, getUsers, updateUser, deleteUser };
+const updateCart = async (req, res) => {
+  try {
+    const { _id } = req.user;
+    const { id, quantity } = req.body;
+    if (!id || !quantity)
+      throw new Error("Vui lòng điền vào id và số lượng sản phẩm");
+
+    const user = await User.findById(_id).select("cart");
+    const alreadyProduct = user.cart.find(
+      (item) => item.product.toString() === id
+    );
+    if (alreadyProduct) {
+      const response = await User.updateOne(
+        {
+          cart: { $elemMatch: alreadyProduct },
+        },
+        { $set: { "cart.$.quantity": quantity } },
+        { new: true }
+      );
+      return res.status(200).json({
+        success: response ? true : false,
+        updatedUserCart: response
+          ? response
+          : "Không thể thêm sản phẩm vào giỏ hàng",
+      });
+    } else {
+      const response = await User.findByIdAndUpdate(
+        _id,
+        {
+          $push: { cart: { product: id, quantity } },
+        },
+        { new: true }
+      );
+      return res.status(200).json({
+        success: response ? true : false,
+        updatedUserCart: response
+          ? response
+          : "Không thể thêm sản phẩm vào giỏ hàng",
+      });
+    }
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+export {
+  register,
+  login,
+  logOut,
+  getUser,
+  getUsers,
+  updateUser,
+  deleteUser,
+  updateCart,
+};

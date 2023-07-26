@@ -25,6 +25,16 @@ var userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    cart: [
+      {
+        product: { type: mongoose.Types.ObjectId, ref: "Product" },
+        quantity: Number,
+      },
+    ],
+    isBlocked: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
