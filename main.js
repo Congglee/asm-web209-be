@@ -8,6 +8,7 @@ dotenv.config();
 import productRoute from "./routers/product.js";
 import categoryRoute from "./routers/category.js";
 import userRoute from "./routers/user.js";
+import orderRoute from "./routers/order.js";
 
 const app = express();
 
@@ -21,6 +22,7 @@ app.use(cors());
 app.use("/api", productRoute);
 app.use("/api", categoryRoute);
 app.use("/api", userRoute);
+app.use("/api", orderRoute);
 
 mongoose
   .connect(
