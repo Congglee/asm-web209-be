@@ -1,4 +1,5 @@
 import Product from "../models/product.js";
+import Category from "../models/category.js";
 import slugify from "slugify";
 import {
   createProductSchema,
@@ -216,8 +217,22 @@ const getProducts = async (req, res) => {
     if (queries?.name)
       formattedQueries.name = { $regex: queries.name, $options: "i" };
 
-    if (queries?.categoryId && Types.ObjectId.isValid(queries.categoryId))
-      formattedQueries.categoryId = queries.categoryId;
+    if (queries?.category) {
+      const category = await Category.findOne({
+        slug: queries.category.toLowerCase(),
+      });
+      if (category) {
+        formattedQueries.categoryId = category._id;
+      } else {
+        return res.status(200).json({
+          success: false,
+          totalPages: 0,
+          totalProduct: 0,
+          products: [],
+        });
+      }
+    }
+
     let queryCommand = Product.find(formattedQueries).populate({
       path: "categoryId",
       select: "name slug",
