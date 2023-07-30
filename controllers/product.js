@@ -246,10 +246,10 @@ const getProducts = async (req, res) => {
     const totalPages = Math.ceil(totalProduct / +limit);
 
     return res.status(200).json({
-      success: response.length > 0,
+      success: response ? true : false,
       totalPages,
       totalProduct,
-      products: response.length > 0 ? response : "Cannot get products",
+      products: response ? response : "Cannot get products",
     });
   } catch (error) {
     return res.status(400).json({
