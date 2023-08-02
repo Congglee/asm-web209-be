@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import mongoose from "mongoose";
 import cookieParser from "cookie-parser";
+
 dotenv.config();
 
 import productRoute from "./routers/product.js";
@@ -12,7 +13,7 @@ import orderRoute from "./routers/order.js";
 
 const app = express();
 
-const port = process.env.PORT || 8888;
+const port = process.env.PORT || 8080;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

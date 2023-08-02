@@ -23,7 +23,7 @@ var productSchema = new mongoose.Schema(
     },
     quantity: {
       type: Number,
-      default: 0,
+      default: 1,
     },
     categoryId: {
       type: mongoose.Types.ObjectId,
