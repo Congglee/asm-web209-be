@@ -271,6 +271,35 @@ const updateCart = async (req, res) => {
   }
 };
 
+const updateCarts = async (req, res) => {
+  try {
+    const { _id } = req.user;
+    const { carts } = req.body;
+
+    const user = await User.findById(_id);
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    user.cart = carts;
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Cart updated successfully",
+    });
+  } catch (error) {
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 export {
   register,
   login,
@@ -280,4 +309,5 @@ export {
   updateUser,
   deleteUser,
   updateCart,
+  updateCarts,
 };
