@@ -12,8 +12,11 @@ const createProduct = async (req, res) => {
       abortEarly: false,
     });
     if (error) {
-      const errors = error.details.map((errItem) => errItem.message);
-
+      const errors = error.details.reduce((acc, errItem) => {
+        acc[errItem.path[0]] = errItem.message;
+        return acc;
+      }, {});
+      console.log(error.details);
       return res.status(400).json({
         success: false,
         message: errors,
@@ -27,8 +30,9 @@ const createProduct = async (req, res) => {
     if (existingProduct) {
       return res.status(400).json({
         success: false,
-        message:
-          "Sản phẩm có cùng tên đã tồn tại, vui lòng nhập lại tên sản phẩm",
+        message: {
+          name: "Products with the same name already exist, please re-enter the product name",
+        },
       });
     }
 
@@ -52,7 +56,10 @@ const updateProduct = async (req, res) => {
       abortEarly: false,
     });
     if (error) {
-      const errors = error.details.map((errItem) => errItem.message);
+      const errors = error.details.reduce((acc, errItem) => {
+        acc[errItem.path[0]] = errItem.message;
+        return acc;
+      }, {});
       return res.status(400).json({
         success: false,
         message: errors,
@@ -96,8 +103,9 @@ const updateProduct = async (req, res) => {
       if (existingProduct) {
         return res.status(400).json({
           success: false,
-          messages:
-            "Sản phẩm trùng tên đã tồn tại, vui lòng nhập lại tên sản phẩm",
+          message: {
+            name: "Products with the same name already exist, please re-enter the product name",
+          },
         });
       }
     }

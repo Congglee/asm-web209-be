@@ -2,47 +2,47 @@ import Joi from "joi";
 
 export const createProductSchema = Joi.object({
   name: Joi.string().trim().required().messages({
-    "string.empty": "Tên sản phẩm không được để trống",
-    "any.required": "Trường tên sản phẩm là bắt buộc",
+    "string.empty": "Product name cannot be empty",
+    "any.required": "Product name field is required",
   }),
   thumb: Joi.string().trim().messages({
-    "string.empty": "Ảnh đại diện sản phẩm không được để trống",
+    "string.empty": "The product thumbnail cannot be blank",
   }),
   images: Joi.array().items(Joi.string()).messages({
-    "array.base": "Ảnh sản phẩm phải là một mảng",
-    "string.empty": "Ảnh sản phẩm không được để trống",
+    "array.base": "Product detail images cannot be left blank",
+    "string.empty": "Product detail images cannot be left blank",
   }),
   price: Joi.number().required().messages({
-    "number.empty": "Giá sản phẩm không được để trống",
-    "any.required": "Trường giá sản phẩm là bắt buộc",
+    "number.empty": "Product price cannot be empty",
+    "any.required": "Product price field is required",
   }),
   description: Joi.string().trim().messages({
-    "string.empty": "Mô tả sản phẩm không được để trống",
+    "string.empty": "Product description cannot be blank",
   }),
   categoryId: Joi.string().trim().required().messages({
-    "string.empty": "Danh mục sản phẩm không được để trống",
-    "any.required": "Trường danh mục sản phẩm là bắt buộc",
+    "string.empty": "Please select a product category",
+    "any.required": "Product category field is required",
   }),
 });
 
 export const updateProductSchema = Joi.object({
   name: Joi.string().trim().messages({
-    "string.empty": "Tên sản phẩm không được để trống",
+    "string.empty": "Product name cannot be empty",
   }),
   thumb: Joi.string().trim().messages({
-    "string.empty": "Ảnh đại diện sản phẩm không được để trống",
+    "string.empty": "The product thumbnail cannot be blank",
   }),
   images: Joi.array().items(Joi.string()).messages({
-    "array.base": "Ảnh sản phẩm phải là một mảng",
-    "string.empty": "Ảnh sản phẩm không được để trống",
+    "array.base": "Product detail images cannot be left blank",
+    "string.empty": "Product detail images cannot be left blank",
   }),
   price: Joi.number().messages({
-    "number.empty": "Giá sản phẩm không được để trống",
+    "number.empty": "Product price cannot be empty",
   }),
   description: Joi.string().trim().messages({
-    "string.empty": "Mô tả sản phẩm không được để trống",
+    "string.empty": "Product description cannot be blank",
   }),
   categoryId: Joi.string().trim().messages({
-    "string.empty": "Danh mục sản phẩm không được để trống",
+    "string.empty": "Please select a product category",
   }),
 });
