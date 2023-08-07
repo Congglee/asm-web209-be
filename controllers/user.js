@@ -274,7 +274,7 @@ const updateCart = async (req, res) => {
 const updateCarts = async (req, res) => {
   try {
     const { _id } = req.user;
-    const { carts } = req.body;
+    const carts = req.body;
 
     const user = await User.findById(_id);
 
