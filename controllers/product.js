@@ -5,6 +5,7 @@ import {
   createProductSchema,
   updateProductSchema,
 } from "../schemas/product.js";
+// import { v2 as cloudinary } from "cloudinary";
 
 const createProduct = async (req, res) => {
   try {
@@ -16,7 +17,6 @@ const createProduct = async (req, res) => {
         acc[errItem.path[0]] = errItem.message;
         return acc;
       }, {});
-      console.log(error.details);
       return res.status(400).json({
         success: false,
         message: errors,
@@ -36,7 +36,63 @@ const createProduct = async (req, res) => {
       });
     }
 
+    const thumbFiles = req.files["thumb"];
+    const imageFiles = req.files["images"];
+
+    const thumbFile = thumbFiles[0];
+    const allowedThumbFileExtensions = ["jpg", "jpeg", "png", "webp"];
+    const allowedThumbFileSize = 5 * 1024 * 1024; // 5 MB in bytes
+
+    // Validate thumb file
+    if (
+      !allowedThumbFileExtensions.includes(
+        thumbFile.originalname.split(".").pop().toLowerCase()
+      ) ||
+      thumbFile.size > allowedThumbFileSize
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: {
+          thumb:
+            "Invalid thumbnail file. Only JPG, JPEG, PNG, or WEBP files are allowed, and the size must be less than 5 MB",
+        },
+      });
+    }
+
+    // Validate image files
+    const allowedImageFileExtensions = ["jpg", "jpeg", "png", "webp"];
+    const allowedImageFileSize = 5 * 1024 * 1024;
+
+    if (!imageFiles || imageFiles.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: {
+          images: "Please upload at least one image file",
+        },
+      });
+    }
+
+    for (const imageFile of imageFiles) {
+      if (
+        !allowedImageFileExtensions.includes(
+          imageFile.originalname.split(".").pop().toLowerCase()
+        ) ||
+        imageFile.size > allowedImageFileSize
+      ) {
+        return res.status(400).json({
+          success: false,
+          message: {
+            images:
+              "Invalid image file(s). Only JPG, JPEG, PNG, or WEBP files are allowed, and the size must be less than 5 MB",
+          },
+        });
+      }
+    }
+
     const newProduct = await Product.create(req.body);
+    newProduct.thumb = thumbFile.path;
+    newProduct.images = imageFiles.map((file) => file.path);
+    await newProduct.save();
 
     return res.status(200).json({
       success: newProduct ? true : false,
@@ -110,6 +166,9 @@ const updateProduct = async (req, res) => {
       }
     }
 
+    const thumbFiles = req?.files?.["thumb"];
+    const imageFiles = req?.files?.["images"];
+
     const updatedProduct = await Product.findByIdAndUpdate(
       id,
       { ...req.body, slug: newSlug },
@@ -117,6 +176,57 @@ const updateProduct = async (req, res) => {
         new: true,
       }
     );
+
+    const allowedThumbFileExtensions = ["jpg", "jpeg", "png", "webp"];
+    const allowedThumbFileSize = 5 * 1024 * 1024; // 5 MB in bytes
+
+    // Validate thumb file
+    if (thumbFiles && thumbFiles.length > 0) {
+      const thumbFile = thumbFiles[0];
+      if (
+        !allowedThumbFileExtensions.includes(
+          thumbFile.originalname.split(".").pop().toLowerCase()
+        ) ||
+        thumbFile.size > allowedThumbFileSize
+      ) {
+        return res.status(400).json({
+          success: false,
+          message: {
+            thumb:
+              "Invalid thumbnail file. Only JPG, JPEG, PNG, or WEBP files are allowed, and the size must be less than 5 MB",
+          },
+        });
+      } else {
+        updatedProduct.thumb = thumbFiles[0].path;
+      }
+    }
+
+    // Validate image files
+    const allowedImageFileExtensions = ["jpg", "jpeg", "png", "webp"];
+    const allowedImageFileSize = 5 * 1024 * 1024;
+
+    if (imageFiles && imageFiles.length > 0) {
+      for (const imageFile of imageFiles) {
+        if (
+          !allowedImageFileExtensions.includes(
+            imageFile.originalname.split(".").pop().toLowerCase()
+          ) ||
+          imageFile.size > allowedImageFileSize
+        ) {
+          return res.status(400).json({
+            success: false,
+            message: {
+              images:
+                "Invalid image file(s). Only JPG, JPEG, PNG, or WEBP files are allowed, and the size must be less than 5 MB",
+            },
+          });
+        } else {
+          updatedProduct.images = imageFiles.map((file) => file.path);
+        }
+      }
+    }
+
+    await updatedProduct.save();
 
     return res.status(200).json({
       success: updatedProduct ? true : false,
