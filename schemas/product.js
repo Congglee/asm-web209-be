@@ -8,9 +8,9 @@ export const createProductSchema = Joi.object({
   thumb: Joi.string().trim().messages({
     "string.empty": "The product thumbnail cannot be blank",
   }),
-  images: Joi.array().items(Joi.string()).messages({
+  images: Joi.array().items(Joi.string()).min(1).messages({
     "array.base": "Product detail images cannot be left blank",
-    "string.empty": "Product detail images cannot be left blank",
+    "array.min": "Please upload at least one image file",
   }),
   price: Joi.number().required().messages({
     "number.empty": "Product price cannot be empty",
@@ -32,9 +32,9 @@ export const updateProductSchema = Joi.object({
   thumb: Joi.string().trim().messages({
     "string.empty": "The product thumbnail cannot be blank",
   }),
-  images: Joi.array().items(Joi.string()).messages({
+  images: Joi.array().items(Joi.string()).optional().min(1).messages({
     "array.base": "Product detail images cannot be left blank",
-    "string.empty": "Product detail images cannot be left blank",
+    "array.min": "Please upload at least one image file",
   }),
   price: Joi.number().messages({
     "number.empty": "Product price cannot be empty",
